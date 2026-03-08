@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>준 ♥ 태 | 우리의 결혼 준비</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #b08968;
+      --primary-light: #ddb892;
+      --primary-dark: #7f5539;
+      --bg: #fefae0;
+      --bg-card: #ffffff;
+      --text: #3d3d3d;
+      --text-light: #6b6b6b;
+      --accent: #e07a5f;
+      --success: #81b29a;
+      --border: #e8e0d4;
+    }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      padding: 80px 20px 60px;
+      background: linear-gradient(135deg, #fefae0 0%, #faedcd 50%, #e9edc9 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(circle at 20% 80%, rgba(176,137,104,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 20%, rgba(224,122,95,0.1) 0%, transparent 50%);
+    }
+
+    .header-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .couple-names {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+      letter-spacing: 4px;
+    }
+
+    .couple-names .heart {
+      color: var(--accent);
+      display: inline-block;
+      animation: heartbeat 1.5s ease-in-out infinite;
+      margin: 0 12px;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .header-sub {
+      font-size: 1.1rem;
+      color: var(--text-light);
+      font-weight: 300;
+      margin-top: 12px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 8px 24px;
+      background: var(--primary);
+      color: white;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+
+    /* Navigation */
+    .nav {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      padding: 16px 20px;
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--text-light);
+      padding: 8px 18px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .nav a:hover {
+      background: var(--primary-light);
+      color: white;
+    }
+
+    /* Sections */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .section {
+      margin: 40px 0;
+    }
+
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--primary-light);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-title .icon {
+      font-size: 1.3rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      border: 1px solid var(--border);
+      transition: transform 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* Checklist */
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 18px 24px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      margin-bottom: 10px;
+      border: 1px solid var(--border);
+      transition: all 0.3s;
+    }
+
+    .checklist-item:hover {
+      border-color: var(--primary-light);
+    }
+
+    .check-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .check-content {
+      flex: 1;
+    }
+
+    .check-title {
+      font-weight: 600;
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
+
+    .check-desc {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    .check-status {
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .status-yet {
+      background: #f0f0f0;
+      color: #999;
+    }
+
+    .status-ing {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-done {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    /* Budget */
+    .budget-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .budget-box {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .budget-box .label {
+      font-size: 0.85rem;
+      color: var(--text-light);
+      margin-bottom: 8px;
+    }
+
+    .budget-box .amount {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+    }
+
+    .budget-box .amount.accent {
+      color: var(--accent);
+    }
+
+    .budget-box .amount.success {
+      color: var(--success);
+    }
+
+    .budget-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .budget-table th {
+      background: var(--primary);
+      color: white;
+      padding: 14px 18px;
+      text-align: left;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+
+    .budget-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .budget-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .budget-table tr:hover td {
+      background: #faf8f5;
+    }
+
+    .budget-table .cost {
+      font-weight: 600;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .budget-table .note {
+      color: var(--text-light);
+      font-size: 0.8rem;
+    }
+
+    /* Venue */
+    .venue-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .venue-card .venue-name {
+      grid-column: 1 / -1;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary-dark);
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .venue-info {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .venue-info strong {
+      color: var(--text);
+    }
+
+    /* D-day */
+    .dday-box {
+      text-align: center;
+      padding: 50px 20px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+      border-radius: 20px;
+      color: white;
+    }
+
+    .dday-box .dday-label {
+      font-size: 1rem;
+      font-weight: 300;
+      margin-bottom: 8px;
+      opacity: 0.9;
+    }
+
+    .dday-box .dday-message {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .dday-box .dday-sub {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    /* Notes */
+    .note-box {
+      background: #fff8e1;
+      border-left: 4px solid var(--primary);
+      padding: 18px 24px;
+      border-radius: 0 12px 12px 0;
+      margin: 16px 0;
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      margin-top: 60px;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .couple-names { font-size: 2rem; }
+      .venue-card { grid-template-columns: 1fr; }
+      .budget-table th, .budget-table td { padding: 10px 12px; font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-content">
+      <div class="couple-names">준 <span class="heart">&#10084;</span> 태</div>
+      <div class="header-sub">우리의 결혼 준비 일지</div>
+      <div class="status-badge">준비 시작 !</div>
+    </div>
+  </div>
+
+  <!-- Nav -->
+  <nav class="nav">
+    <a href="#checklist">체크리스트</a>
+    <a href="#budget">예산</a>
+    <a href="#venue">예식장 후보</a>
+    <a href="#dday">D-day</a>
+    <a href="#memo">메모</a>
+  </nav>
+
+  <div class="container">
+
+    <!-- Checklist -->
+    <section class="section" id="checklist">
+      <div class="section-title"><span class="icon">&#9745;</span> 결혼 준비 체크리스트</div>
+
+      <div class="checklist-item">
+        <div class="check-num">1</div>
+        <div class="check-content">
+          <div class="check-title">양가 상견례</div>
+          <div class="check-desc">양가 부모님 일정 조율 후 식사 장소 예약. 격식 있는 한정식 추천.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">2</div>
+        <div class="check-content">
+          <div class="check-title">예식 날짜 확정</div>
+          <div class="check-desc">양가 협의 후 날짜 확정. 보통 상견례 후 3~6개월 뒤로 잡음. 주말/공휴일 인기 많으니 빨리 정할수록 좋음.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">3</div>
+        <div class="check-content">
+          <div class="check-title">예식장 투어 &amp; 계약</div>
+          <div class="check-desc">서울·안양 지역 웨딩홀 3~5곳 방문. 식대·대관료·하객 수용 인원·주차 확인 필수.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">4</div>
+        <div class="check-content">
+          <div class="check-title">스드메 (스튜디오·드레스·메이크업)</div>
+          <div class="check-desc">패키지 vs 각각 따로 계약. 패키지가 보통 저렴하지만 퀄리티 비교 필수. 촬영 보통 결혼 1~2달 전.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">5</div>
+        <div class="check-content">
+          <div class="check-title">예물·예단</div>
+          <div class="check-desc">커플링, 예물 시계 등. 양가 협의하에 범위 결정. 부담 없는 선에서 진행.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">6</div>
+        <div class="check-content">
+          <div class="check-title">청첩장 제작 &amp; 발송</div>
+          <div class="check-desc">모바일 청첩장 + 종이 청첩장. 보통 결혼 4~6주 전 발송. 하객 리스트 미리 정리.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">7</div>
+        <div class="check-content">
+          <div class="check-title">신혼집 구하기</div>
+          <div class="check-desc">전세/매매 결정 → 지역·예산에 맞춰 매물 탐색. 결혼 2~3개월 전까지 확정 권장.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">8</div>
+        <div class="check-content">
+          <div class="check-title">혼수 (가전·가구)</div>
+          <div class="check-desc">냉장고, 세탁기, TV, 침대, 소파 등. 양가 분담 협의. 신혼집 확정 후 사이즈 맞춰 구매.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+      <div class="checklist-item">
+        <div class="check-num">9</div>
+        <div class="check-content">
+          <div class="check-title">혼인신고</div>
+          <div class="check-desc">결혼식 전후 주민센터에서 신고. 신분증 + 혼인신고서 + 증인 2명 서명 필요.</div>
+        </div>
+        <span class="check-status status-yet">미정</span>
+      </div>
+
+    </section>
+
+    <!-- Budget -->
+    <section class="section" id="budget">
+      <div class="section-title"><span class="icon">&#128176;</span> 예산 계획</div>
+
+      <div class="budget-summary">
+        <div class="budget-box">
+          <div class="label">총 예산</div>
+          <div class="amount">2,000만원</div>
+        </div>
+        <div class="budget-box">
+          <div class="label">예상 지출</div>
+          <div class="amount accent">1,570만원</div>
+        </div>
+        <div class="budget-box">
+          <div class="label">여유분</div>
+          <div class="amount success">430만원</div>
+        </div>
+      </div>
+
+      <div class="note-box">
+        서울·안양 기준 절약형 결혼 예산안입니다. 신혼여행·축의금은 별도입니다.
+      </div>
+
+      <table class="budget-table">
+        <thead>
+          <tr>
+            <th>항목</th>
+            <th>상세</th>
+            <th class="cost">예상 비용</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>예식장</strong></td>
+            <td class="note">대관료 + 식대 (80명 기준)</td>
+            <td class="cost">500만원</td>
+          </tr>
+          <tr>
+            <td><strong>스드메 패키지</strong></td>
+            <td class="note">스튜디오 + 드레스 + 메이크업</td>
+            <td class="cost">250만원</td>
+          </tr>
+          <tr>
+            <td><strong>예물</strong></td>
+            <td class="note">커플링 + 예물</td>
+            <td class="cost">150만원</td>
+          </tr>
+          <tr>
+            <td><strong>청첩장</strong></td>
+            <td class="note">모바일 + 종이 (100부)</td>
+            <td class="cost">20만원</td>
+          </tr>
+          <tr>
+            <td><strong>혼수 (가전·가구)</strong></td>
+            <td class="note">필수 가전 + 기본 가구</td>
+            <td class="cost">500만원</td>
+          </tr>
+          <tr>
+            <td><strong>상견례 식사</strong></td>
+            <td class="note">한정식 6인 기준</td>
+            <td class="cost">30만원</td>
+          </tr>
+          <tr>
+            <td><strong>부케·부토니에</strong></td>
+            <td class="note">생화 기준</td>
+            <td class="cost">20만원</td>
+          </tr>
+          <tr>
+            <td><strong>기타 (영상·사회자 등)</strong></td>
+            <td class="note">식전영상, 축가, 소품 등</td>
+            <td class="cost">100만원</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Venue -->
+    <section class="section" id="venue">
+      <div class="section-title"><span class="icon">&#127970;</span> 예식장 후보 (서울·안양)</div>
+
+      <div class="note-box">
+        아직 확정 전! 방문 후보지 리스트입니다. 투어 다녀오면 업데이트할게요.
+      </div>
+
+      <div class="venue-card">
+        <div class="venue-name">후보 1: (미정)</div>
+        <div class="venue-info"><strong>위치:</strong> -</div>
+        <div class="venue-info"><strong>예상 비용:</strong> -</div>
+        <div class="venue-info"><strong>수용 인원:</strong> -</div>
+        <div class="venue-info"><strong>메모:</strong> -</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="venue-name">후보 2: (미정)</div>
+        <div class="venue-info"><strong>위치:</strong> -</div>
+        <div class="venue-info"><strong>예상 비용:</strong> -</div>
+        <div class="venue-info"><strong>수용 인원:</strong> -</div>
+        <div class="venue-info"><strong>메모:</strong> -</div>
+      </div>
+
+      <div class="venue-card">
+        <div class="venue-name">후보 3: (미정)</div>
+        <div class="venue-info"><strong>위치:</strong> -</div>
+        <div class="venue-info"><strong>예상 비용:</strong> -</div>
+        <div class="venue-info"><strong>수용 인원:</strong> -</div>
+        <div class="venue-info"><strong>메모:</strong> -</div>
+      </div>
+    </section>
+
+    <!-- D-day -->
+    <section class="section" id="dday">
+      <div class="section-title"><span class="icon">&#128197;</span> D-day</div>
+      <div class="dday-box">
+        <div class="dday-label">결혼식까지</div>
+        <div class="dday-message">아직 날짜를 정하지 않았어요</div>
+        <div class="dday-sub">날짜가 정해지면 카운트다운이 시작됩니다</div>
+      </div>
+    </section>
+
+    <!-- Memo -->
+    <section class="section" id="memo">
+      <div class="section-title"><span class="icon">&#128221;</span> 메모</div>
+      <div class="card">
+        <p style="color: var(--text-light); font-size: 0.95rem;">
+          결혼 준비하면서 기록해둘 것들을 여기에 남겨요.<br>
+          아이디어, 고민, 결정 사항 등 자유롭게!
+        </p>
+        <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;">
+        <ul style="color: var(--text); font-size: 0.9rem; padding-left: 20px; line-height: 2;">
+          <li>지역: 서울 / 경기 안양 범위에서 예식장 찾기</li>
+          <li>예산 2,000만원 이하로 절약 결혼 목표</li>
+          <li>아직 아무것도 시작 안 했음 - 상견례부터!</li>
+        </ul>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>준 &amp; 태 | 우리만의 결혼 준비 페이지</p>
+    <p style="margin-top: 6px; font-size: 0.75rem;">마지막 업데이트: 2026년 3월 8일</p>
+  </div>
+
+</body>
+</html>
