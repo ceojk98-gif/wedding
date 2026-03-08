@@ -388,6 +388,42 @@
       margin-top: 60px;
     }
 
+    /* Editable cards */
+    .edit-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 12px;
+      transition: border-color 0.3s;
+    }
+    .edit-card:hover { border-color: var(--primary-light); }
+    .edit-card .card-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border);
+    }
+    .edit-card .card-header span {
+      font-weight: 700; font-size: 1.05rem; color: var(--primary-dark);
+    }
+    .edit-card .card-btn {
+      padding: 4px 14px; border-radius: 6px; border: 1px solid var(--primary-light);
+      background: none; color: var(--primary); font-size: 0.8rem; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
+    }
+    .edit-card .card-btn:hover { background: var(--primary); color: white; }
+    .edit-card .field-row {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.9rem;
+    }
+    .edit-card .field-label {
+      font-weight: 600; min-width: 90px; color: var(--text); flex-shrink: 0;
+    }
+    .edit-card .field-value { color: var(--text-light); flex: 1; word-break: break-word; }
+    .edit-card input.field-input {
+      flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: 6px;
+      font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif; outline: none;
+    }
+    .edit-card input.field-input:focus { border-color: var(--primary); }
+
     /* Responsive */
     @media (max-width: 600px) {
       .couple-names { font-size: 2rem; }
@@ -590,29 +626,7 @@
         아직 확정 전! 방문 후보지 리스트입니다. 투어 다녀오면 업데이트할게요.
       </div>
 
-      <div class="venue-card">
-        <div class="venue-name">후보 1: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>예상 비용:</strong> -</div>
-        <div class="venue-info"><strong>수용 인원:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
-
-      <div class="venue-card">
-        <div class="venue-name">후보 2: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>예상 비용:</strong> -</div>
-        <div class="venue-info"><strong>수용 인원:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
-
-      <div class="venue-card">
-        <div class="venue-name">후보 3: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>예상 비용:</strong> -</div>
-        <div class="venue-info"><strong>수용 인원:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
+      <div id="venue-cards"></div>
     </section>
 
     <!-- House -->
@@ -691,36 +705,7 @@
         <p style="font-size: 0.8rem; color: var(--text-light); margin-top: 12px;">* 소요시간은 지하철 기준 예상치이며 환승·대기시간 포함 대략적 수치입니다.</p>
       </div>
 
-      <div class="note-box">
-        아직 확정 전! 매물 보러 다니면서 업데이트할게요.
-      </div>
-
-      <div class="venue-card">
-        <div class="venue-name">후보 1: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>유형:</strong> -</div>
-        <div class="venue-info"><strong>보증금/월세:</strong> -</div>
-        <div class="venue-info"><strong>면적:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
-
-      <div class="venue-card">
-        <div class="venue-name">후보 2: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>유형:</strong> -</div>
-        <div class="venue-info"><strong>보증금/월세:</strong> -</div>
-        <div class="venue-info"><strong>면적:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
-
-      <div class="venue-card">
-        <div class="venue-name">후보 3: (미정)</div>
-        <div class="venue-info"><strong>위치:</strong> -</div>
-        <div class="venue-info"><strong>유형:</strong> -</div>
-        <div class="venue-info"><strong>보증금/월세:</strong> -</div>
-        <div class="venue-info"><strong>면적:</strong> -</div>
-        <div class="venue-info"><strong>메모:</strong> -</div>
-      </div>
+      <div id="house-cards"></div>
     </section>
 
     <!-- D-day -->
@@ -831,6 +816,99 @@
     };
 
     renderMemos();
+
+    /* ── Editable Cards (예식장 & 신혼집) ── */
+    var venueFields = ['위치', '예상 비용', '수용 인원', '메모'];
+    var houseFields = ['위치', '유형', '보증금/월세', '면적', '메모'];
+
+    function getCards(key, fields) {
+      var saved = localStorage.getItem(key);
+      if (saved) return JSON.parse(saved);
+      var arr = [];
+      for (var i = 0; i < 3; i++) {
+        var obj = {};
+        fields.forEach(function(f) { obj[f] = '-'; });
+        arr.push(obj);
+      }
+      return arr;
+    }
+
+    function saveCards(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function renderCards(containerId, storageKey, fields) {
+      var container = document.getElementById(containerId);
+      var cards = getCards(storageKey, fields);
+      container.innerHTML = '';
+
+      cards.forEach(function(card, idx) {
+        var div = document.createElement('div');
+        div.className = 'edit-card';
+
+        var header = document.createElement('div');
+        header.className = 'card-header';
+        var title = document.createElement('span');
+        title.textContent = '후보 ' + (idx + 1);
+        var btn = document.createElement('button');
+        btn.className = 'card-btn';
+        btn.textContent = '수정';
+        header.appendChild(title);
+        header.appendChild(btn);
+        div.appendChild(header);
+
+        var body = document.createElement('div');
+        body.className = 'card-body';
+
+        // View mode
+        function showView() {
+          body.innerHTML = '';
+          fields.forEach(function(f) {
+            var row = document.createElement('div');
+            row.className = 'field-row';
+            row.innerHTML = '<span class="field-label">' + f + '</span><span class="field-value">' + (card[f] || '-') + '</span>';
+            body.appendChild(row);
+          });
+          btn.textContent = '수정';
+          btn.onclick = function() { showEdit(); };
+        }
+
+        // Edit mode
+        function showEdit() {
+          body.innerHTML = '';
+          var inputs = {};
+          fields.forEach(function(f) {
+            var row = document.createElement('div');
+            row.className = 'field-row';
+            row.innerHTML = '<span class="field-label">' + f + '</span>';
+            var inp = document.createElement('input');
+            inp.className = 'field-input';
+            inp.value = card[f] === '-' ? '' : card[f];
+            inp.placeholder = f + ' 입력...';
+            inputs[f] = inp;
+            row.appendChild(inp);
+            body.appendChild(row);
+          });
+          btn.textContent = '저장';
+          btn.onclick = function() {
+            fields.forEach(function(f) {
+              card[f] = inputs[f].value.trim() || '-';
+            });
+            var all = getCards(storageKey, fields);
+            all[idx] = card;
+            saveCards(storageKey, all);
+            showView();
+          };
+        }
+
+        showView();
+        div.appendChild(body);
+        container.appendChild(div);
+      });
+    }
+
+    renderCards('venue-cards', 'wedding-venues', venueFields);
+    renderCards('house-cards', 'wedding-houses', houseFields);
   </script>
 </body>
 </html>
