@@ -737,16 +737,22 @@
     <section class="section" id="memo">
       <div class="section-title"><span class="icon">&#128221;</span> 메모</div>
       <div class="card">
-        <p style="color: var(--text-light); font-size: 0.95rem;">
-          결혼 준비하면서 기록해둘 것들을 여기에 남겨요.<br>
-          아이디어, 고민, 결정 사항 등 자유롭게!
+        <p style="color: var(--text-light); font-size: 0.95rem; margin-bottom: 12px;">
+          결혼 준비하면서 기록해둘 것들을 여기에 남겨요. 이 브라우저에 저장됩니다.
         </p>
-        <hr style="border: none; border-top: 1px solid var(--border); margin: 16px 0;">
-        <ul style="color: var(--text); font-size: 0.9rem; padding-left: 20px; line-height: 2;">
-          <li>지역: 서울 / 경기 안양 범위에서 예식장 찾기</li>
-          <li>예산 2,000만원 이하로 절약 결혼 목표</li>
-          <li>아직 아무것도 시작 안 했음 - 상견례부터!</li>
-        </ul>
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <input type="text" id="memo-input" placeholder="메모를 입력하세요..." style="
+            flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+            font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif; outline: none;
+            transition: border-color 0.3s;
+          ">
+          <button id="memo-add" style="
+            padding: 10px 20px; background: var(--primary); color: white; border: none;
+            border-radius: 8px; font-size: 0.9rem; font-family: 'Noto Sans KR', sans-serif;
+            cursor: pointer; white-space: nowrap; transition: background 0.3s;
+          ">추가</button>
+        </div>
+        <ul id="memo-list" style="list-style: none; padding: 0; margin: 0;"></ul>
       </div>
     </section>
 
@@ -758,5 +764,73 @@
     <p style="margin-top: 6px; font-size: 0.75rem;">마지막 업데이트: 2026년 3월 8일</p>
   </div>
 
+  <script>
+    const STORAGE_KEY = 'wedding-memos';
+    const defaultMemos = [
+      '지역: 서울 / 경기 안양 범위에서 예식장 찾기',
+      '예산 2,000만원 이하로 절약 결혼 목표',
+      '아직 아무것도 시작 안 했음 - 상견례부터!'
+    ];
+
+    function loadMemos() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : defaultMemos;
+    }
+
+    function saveMemos(memos) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
+    }
+
+    function renderMemos() {
+      const list = document.getElementById('memo-list');
+      const memos = loadMemos();
+      list.innerHTML = '';
+      memos.forEach(function(memo, i) {
+        const li = document.createElement('li');
+        li.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 14px; background:#faf8f5; border-radius:8px; margin-bottom:8px; font-size:0.9rem;';
+        const text = document.createElement('span');
+        text.style.cssText = 'flex:1; word-break:break-word;';
+        text.textContent = memo;
+        const del = document.createElement('button');
+        del.textContent = 'X';
+        del.style.cssText = 'background:none; border:1px solid #ddd; color:#999; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:0.75rem; flex-shrink:0; transition:all 0.2s;';
+        del.onmouseenter = function() { del.style.background='#e07a5f'; del.style.color='white'; del.style.borderColor='#e07a5f'; };
+        del.onmouseleave = function() { del.style.background='none'; del.style.color='#999'; del.style.borderColor='#ddd'; };
+        del.onclick = function() {
+          const memos = loadMemos();
+          memos.splice(i, 1);
+          saveMemos(memos);
+          renderMemos();
+        };
+        li.appendChild(text);
+        li.appendChild(del);
+        list.appendChild(li);
+      });
+    }
+
+    function addMemo() {
+      const input = document.getElementById('memo-input');
+      const val = input.value.trim();
+      if (!val) return;
+      const memos = loadMemos();
+      memos.push(val);
+      saveMemos(memos);
+      input.value = '';
+      renderMemos();
+    }
+
+    document.getElementById('memo-add').onclick = addMemo;
+    document.getElementById('memo-input').onkeydown = function(e) {
+      if (e.key === 'Enter') addMemo();
+    };
+    document.getElementById('memo-input').onfocus = function() {
+      this.style.borderColor = '#b08968';
+    };
+    document.getElementById('memo-input').onblur = function() {
+      this.style.borderColor = '#e8e0d4';
+    };
+
+    renderMemos();
+  </script>
 </body>
 </html>
