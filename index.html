@@ -424,6 +424,63 @@
     }
     .edit-card input.field-input:focus { border-color: var(--primary); }
 
+    /* Priority list */
+    .priority-section {
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      padding: 22px;
+      margin-bottom: 18px;
+    }
+    .priority-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .priority-title {
+      font-weight: 700; color: var(--primary-dark); font-size: 1.05rem;
+    }
+    .priority-hint {
+      font-size: 0.78rem; color: var(--text-light);
+    }
+    .priority-list { list-style: none; padding: 0; margin: 0; }
+    .priority-item {
+      background: #faf8f5;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 8px;
+      transition: border-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+    .priority-item:hover { border-color: var(--primary-light); }
+    .priority-item.dragging { opacity: 0.45; }
+    .priority-item.drag-over {
+      border-color: var(--primary);
+      border-style: dashed;
+      box-shadow: 0 0 0 3px rgba(176,137,104,0.12);
+    }
+    .priority-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .priority-handle {
+      color: var(--text-light); font-size: 1.1rem; cursor: grab;
+      user-select: none; padding: 0 4px; line-height: 1;
+    }
+    .priority-handle:active { cursor: grabbing; }
+    .priority-rank {
+      width: 30px; height: 30px; border-radius: 50%; background: var(--primary);
+      color: white; display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 0.9rem; flex-shrink: 0;
+    }
+    .priority-name { font-weight: 600; flex: 1; font-size: 0.95rem; }
+    .priority-memo {
+      width: 100%; margin-top: 10px; padding: 8px 10px;
+      border: 1px solid var(--border); border-radius: 6px;
+      font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;
+      outline: none; resize: vertical; min-height: 44px;
+      background: white;
+    }
+    .priority-memo:focus { border-color: var(--primary); }
+
     /* Responsive */
     @media (max-width: 600px) {
       .couple-names { font-size: 2rem; }
@@ -626,6 +683,14 @@
         아직 확정 전! 방문 후보지 리스트입니다. 투어 다녀오면 업데이트할게요.
       </div>
 
+      <div class="priority-section">
+        <div class="priority-header">
+          <span class="priority-title">&#127775; 예식장 선택 우선순위</span>
+          <span class="priority-hint">드래그해서 순서 변경 (메모도 함께 이동)</span>
+        </div>
+        <ul id="priority-list" class="priority-list"></ul>
+      </div>
+
       <div id="venue-cards"></div>
     </section>
 
@@ -759,7 +824,14 @@
 
     function loadMemos() {
       const saved = localStorage.getItem(STORAGE_KEY);
-      return saved ? JSON.parse(saved) : defaultMemos;
+      if (!saved) return defaultMemos.slice();
+      try {
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed)) return defaultMemos.slice();
+        return parsed;
+      } catch (e) {
+        return defaultMemos.slice();
+      }
     }
 
     function saveMemos(memos) {
@@ -823,7 +895,12 @@
 
     function getCards(key, fields) {
       var saved = localStorage.getItem(key);
-      if (saved) return JSON.parse(saved);
+      if (saved) {
+        try {
+          var parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) return parsed;
+        } catch (e) { /* fall through to defaults */ }
+      }
       var arr = [];
       for (var i = 0; i < 3; i++) {
         var obj = {};
@@ -909,6 +986,120 @@
 
     renderCards('venue-cards', 'wedding-venues', venueFields);
     renderCards('house-cards', 'wedding-houses', houseFields);
+
+    /* ── 예식장 우선순위 (드래그 정렬 + 메모) ── */
+    var PRIORITY_KEY = 'wedding-venue-priorities';
+    var defaultPriorities = [
+      { name: '예식 날짜', memo: '' },
+      { name: '예식 시간', memo: '' },
+      { name: '예식장 분위기', memo: '' },
+      { name: '예식장 위치', memo: '' },
+      { name: '뷔페 맛', memo: '' },
+      { name: '주차장 크기', memo: '' }
+    ];
+
+    function loadPriorities() {
+      var saved = localStorage.getItem(PRIORITY_KEY);
+      if (!saved) return defaultPriorities.map(function(p){ return {name:p.name, memo:p.memo}; });
+      try {
+        var arr = JSON.parse(saved);
+        if (!Array.isArray(arr) || arr.length === 0) throw 0;
+        return arr;
+      } catch (e) {
+        return defaultPriorities.map(function(p){ return {name:p.name, memo:p.memo}; });
+      }
+    }
+
+    function savePriorities(arr) {
+      localStorage.setItem(PRIORITY_KEY, JSON.stringify(arr));
+    }
+
+    function renderPriorities() {
+      var list = document.getElementById('priority-list');
+      var items = loadPriorities();
+      list.innerHTML = '';
+
+      items.forEach(function(item, idx) {
+        var li = document.createElement('li');
+        li.className = 'priority-item';
+        li.draggable = true;
+        li.dataset.index = String(idx);
+
+        var row = document.createElement('div');
+        row.className = 'priority-row';
+
+        var handle = document.createElement('span');
+        handle.className = 'priority-handle';
+        handle.textContent = '☰';
+        handle.title = '드래그해서 이동';
+
+        var rank = document.createElement('span');
+        rank.className = 'priority-rank';
+        rank.textContent = String(idx + 1);
+
+        var name = document.createElement('span');
+        name.className = 'priority-name';
+        name.textContent = item.name;
+
+        row.appendChild(handle);
+        row.appendChild(rank);
+        row.appendChild(name);
+        li.appendChild(row);
+
+        var memo = document.createElement('textarea');
+        memo.className = 'priority-memo';
+        memo.placeholder = '이 항목에 대한 메모를 남겨주세요...';
+        memo.value = item.memo || '';
+        memo.oninput = function() {
+          var arr = loadPriorities();
+          var i = parseInt(li.dataset.index, 10);
+          if (arr[i]) {
+            arr[i].memo = memo.value;
+            savePriorities(arr);
+          }
+        };
+        // textarea 내부에서 드래그 시작되지 않도록
+        memo.addEventListener('mousedown', function(e) { e.stopPropagation(); });
+        memo.addEventListener('dragstart', function(e) { e.preventDefault(); e.stopPropagation(); });
+        li.appendChild(memo);
+
+        // ── Drag & Drop ──
+        li.addEventListener('dragstart', function(e) {
+          li.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', li.dataset.index);
+        });
+        li.addEventListener('dragend', function() {
+          li.classList.remove('dragging');
+          var all = document.querySelectorAll('.priority-item');
+          for (var k = 0; k < all.length; k++) all[k].classList.remove('drag-over');
+        });
+        li.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          if (!li.classList.contains('dragging')) li.classList.add('drag-over');
+        });
+        li.addEventListener('dragleave', function() {
+          li.classList.remove('drag-over');
+        });
+        li.addEventListener('drop', function(e) {
+          e.preventDefault();
+          li.classList.remove('drag-over');
+          var from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+          var to = parseInt(li.dataset.index, 10);
+          if (isNaN(from) || isNaN(to) || from === to) return;
+          var arr = loadPriorities();
+          var moved = arr.splice(from, 1)[0];
+          arr.splice(to, 0, moved);
+          savePriorities(arr);
+          renderPriorities();
+        });
+
+        list.appendChild(li);
+      });
+    }
+
+    renderPriorities();
   </script>
 </body>
 </html>
