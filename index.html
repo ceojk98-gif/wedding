@@ -424,6 +424,66 @@
     }
     .edit-card input.field-input:focus { border-color: var(--primary); }
 
+    /* Login overlay */
+    #login-overlay {
+      display: none; position: fixed; inset: 0;
+      background: linear-gradient(135deg, #fefae0 0%, #faedcd 50%, #e9edc9 100%);
+      z-index: 9999; align-items: center; justify-content: center; padding: 20px;
+    }
+    .login-card {
+      background: white; border-radius: 18px; padding: 44px 32px; max-width: 380px;
+      width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.12); text-align: center;
+    }
+    .login-title {
+      font-size: 1.8rem; font-weight: 700; color: var(--primary-dark);
+      letter-spacing: 3px; margin-bottom: 6px;
+    }
+    .login-title .heart { color: var(--accent); margin: 0 8px; }
+    .login-sub {
+      font-size: 0.9rem; color: var(--text-light); margin-bottom: 28px;
+    }
+    .login-msg {
+      font-size: 0.9rem; color: var(--text); margin-bottom: 22px; line-height: 1.7;
+    }
+    .login-btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px 24px; background: white; border: 1px solid #dadce0;
+      border-radius: 8px; cursor: pointer; width: 100%; font-size: 0.95rem;
+      font-family: 'Noto Sans KR', sans-serif; color: #3c4043; font-weight: 500;
+      transition: box-shadow 0.2s, background 0.2s;
+    }
+    .login-btn:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.1); background: #f8f9fa; }
+    .login-btn svg { width: 18px; height: 18px; }
+    .login-blocked-icon { font-size: 2.5rem; margin-bottom: 12px; }
+    .login-blocked-email {
+      display: inline-block; padding: 4px 12px; background: #faf8f5;
+      border-radius: 6px; font-family: monospace; font-size: 0.85rem; color: var(--text);
+      margin: 8px 0 22px;
+    }
+    .login-secondary-btn {
+      padding: 10px 22px; background: var(--primary); color: white; border: none;
+      border-radius: 8px; cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      font-size: 0.9rem;
+    }
+
+    /* User bar */
+    #user-bar {
+      display: none; padding: 8px 20px; background: #faedcd; color: var(--primary-dark);
+      font-size: 0.8rem; align-items: center; justify-content: flex-end; gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    #user-bar .user-email { display: flex; align-items: center; gap: 6px; }
+    #user-bar .logout-btn {
+      padding: 4px 12px; background: transparent; border: 1px solid var(--primary-dark);
+      color: var(--primary-dark); border-radius: 14px; font-size: 0.75rem;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+    }
+    #user-bar .logout-btn:hover { background: var(--primary-dark); color: white; }
+    .sync-indicator {
+      display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+      background: var(--success); margin-right: 4px;
+    }
+
     /* Priority list */
     .priority-section {
       background: var(--bg-card);
@@ -490,6 +550,35 @@
   </style>
 </head>
 <body>
+
+  <!-- Login Overlay -->
+  <div id="login-overlay">
+    <div class="login-card">
+      <div id="login-prompt">
+        <div class="login-title">준 <span class="heart">&#10084;</span> 태</div>
+        <div class="login-sub">우리만의 결혼 준비 페이지</div>
+        <p class="login-msg">두 분의 Google 계정으로 로그인해주세요.</p>
+        <button id="google-signin" class="login-btn">
+          <svg viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 0 1-1.796 2.716v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+          Google 계정으로 로그인
+        </button>
+      </div>
+      <div id="login-blocked" style="display:none;">
+        <div class="login-blocked-icon">&#128683;</div>
+        <div class="login-title" style="font-size:1.2rem; letter-spacing:1px;">접근 권한 없음</div>
+        <p class="login-msg" style="margin-top:14px;">이 페이지는 두 분의 계정만<br>사용할 수 있습니다.</p>
+        <div>로그인된 계정:</div>
+        <div class="login-blocked-email" id="blocked-email"></div>
+        <button id="blocked-logout-btn" class="login-secondary-btn">다른 계정으로 로그인</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Bar -->
+  <div id="user-bar">
+    <span class="user-email"><span class="sync-indicator" title="실시간 동기화 중"></span>&#128104;&#8205;&#10084;&#65039;&#8205;&#128105; <span id="user-info"></span></span>
+    <button id="logout-btn" class="logout-btn">로그아웃</button>
+  </div>
 
   <!-- Header -->
   <div class="header">
@@ -814,35 +903,123 @@
     <p style="margin-top: 6px; font-size: 0.75rem;">마지막 업데이트: 2026년 3월 8일</p>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'wedding-memos';
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-app.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, setDoc } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_MYKnSPNSw-hZ7KaSDgqgGf8Zw1LqxnY",
+      authDomain: "wedding-jun-tae.firebaseapp.com",
+      projectId: "wedding-jun-tae",
+      storageBucket: "wedding-jun-tae.firebasestorage.app",
+      messagingSenderId: "136223082804",
+      appId: "1:136223082804:web:1c4708b1f43ad5cbd8fd61"
+    };
+    const ALLOWED_EMAILS = ['ceojk98@gmail.com', 'kimtg305@gmail.com'];
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const docRef = doc(db, 'shared', 'wedding-data');
+
+    /* ===== Defaults ===== */
     const defaultMemos = [
       '지역: 서울 / 경기 안양 범위에서 예식장 찾기',
       '예산 2,000만원 이하로 절약 결혼 목표',
       '아직 아무것도 시작 안 했음 - 상견례부터!'
     ];
+    const defaultPriorities = [
+      { name: '예식 날짜', memo: '' },
+      { name: '예식 시간', memo: '' },
+      { name: '예식장 분위기', memo: '' },
+      { name: '예식장 위치', memo: '' },
+      { name: '뷔페 맛', memo: '' },
+      { name: '주차장 크기', memo: '' }
+    ];
+    const venueFields = ['위치', '예상 비용', '수용 인원', '메모'];
+    const houseFields = ['위치', '유형', '보증금/월세', '면적', '메모'];
 
-    function loadMemos() {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (!saved) return defaultMemos.slice();
+    function emptyCards(fields, count = 3) {
+      return Array.from({length: count}, () => {
+        const o = {};
+        fields.forEach(f => o[f] = '-');
+        return o;
+      });
+    }
+
+    function getDefaults() {
+      return {
+        memos: defaultMemos.slice(),
+        priorities: defaultPriorities.map(p => ({...p})),
+        venues: emptyCards(venueFields),
+        houses: emptyCards(houseFields)
+      };
+    }
+
+    function migrateFromLocalStorage() {
+      const data = getDefaults();
+      const tryRead = (key) => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) return null;
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : null;
+        } catch (e) { return null; }
+      };
+      const m = tryRead('wedding-memos'); if (m) data.memos = m;
+      const p = tryRead('wedding-venue-priorities'); if (p) data.priorities = p;
+      const v = tryRead('wedding-venues'); if (v) data.venues = v;
+      const h = tryRead('wedding-houses'); if (h) data.houses = h;
+      return data;
+    }
+
+    /* ===== State + Firestore Sync ===== */
+    let currentState = getDefaults();
+    let unsubscribe = null;
+
+    async function writeData(updates) {
+      Object.assign(currentState, updates);
       try {
-        const parsed = JSON.parse(saved);
-        if (!Array.isArray(parsed)) return defaultMemos.slice();
-        return parsed;
+        await setDoc(docRef, currentState);
       } catch (e) {
-        return defaultMemos.slice();
+        console.error('Firestore write failed:', e);
+        alert('저장 실패: ' + e.message);
       }
     }
 
-    function saveMemos(memos) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(memos));
+    function subscribeToData() {
+      unsubscribe = onSnapshot(docRef, async (snap) => {
+        if (!snap.exists()) {
+          const initial = migrateFromLocalStorage();
+          currentState = initial;
+          try { await setDoc(docRef, initial); } catch (e) { console.error(e); }
+          renderAll();
+          return;
+        }
+        const data = snap.data();
+        currentState = { ...getDefaults(), ...data };
+        renderAll();
+      }, (err) => {
+        console.error('Firestore subscribe error:', err);
+        alert('데이터 동기화 오류: ' + err.message + '\n\n보안 규칙(Rules)이 올바르게 설정됐는지 확인해주세요.');
+      });
     }
 
+    function renderAll() {
+      renderMemos();
+      renderCards('venue-cards', 'venues', venueFields);
+      renderCards('house-cards', 'houses', houseFields);
+      renderPriorities();
+    }
+
+    /* ===== Memos ===== */
     function renderMemos() {
       const list = document.getElementById('memo-list');
-      const memos = loadMemos();
+      if (!list) return;
+      const memos = currentState.memos || [];
       list.innerHTML = '';
-      memos.forEach(function(memo, i) {
+      memos.forEach((memo, i) => {
         const li = document.createElement('li');
         li.style.cssText = 'display:flex; align-items:center; gap:10px; padding:10px 14px; background:#faf8f5; border-radius:8px; margin-bottom:8px; font-size:0.9rem;';
         const text = document.createElement('span');
@@ -851,13 +1028,12 @@
         const del = document.createElement('button');
         del.textContent = 'X';
         del.style.cssText = 'background:none; border:1px solid #ddd; color:#999; border-radius:50%; width:26px; height:26px; cursor:pointer; font-size:0.75rem; flex-shrink:0; transition:all 0.2s;';
-        del.onmouseenter = function() { del.style.background='#e07a5f'; del.style.color='white'; del.style.borderColor='#e07a5f'; };
-        del.onmouseleave = function() { del.style.background='none'; del.style.color='#999'; del.style.borderColor='#ddd'; };
-        del.onclick = function() {
-          const memos = loadMemos();
+        del.onmouseenter = () => { del.style.background='#e07a5f'; del.style.color='white'; del.style.borderColor='#e07a5f'; };
+        del.onmouseleave = () => { del.style.background='none'; del.style.color='#999'; del.style.borderColor='#ddd'; };
+        del.onclick = async () => {
+          const memos = (currentState.memos || []).slice();
           memos.splice(i, 1);
-          saveMemos(memos);
-          renderMemos();
+          await writeData({memos});
         };
         li.appendChild(text);
         li.appendChild(del);
@@ -865,100 +1041,60 @@
       });
     }
 
-    function addMemo() {
+    async function addMemo() {
       const input = document.getElementById('memo-input');
       const val = input.value.trim();
       if (!val) return;
-      const memos = loadMemos();
+      const memos = (currentState.memos || []).slice();
       memos.push(val);
-      saveMemos(memos);
       input.value = '';
-      renderMemos();
+      await writeData({memos});
     }
 
-    document.getElementById('memo-add').onclick = addMemo;
-    document.getElementById('memo-input').onkeydown = function(e) {
-      if (e.key === 'Enter') addMemo();
-    };
-    document.getElementById('memo-input').onfocus = function() {
-      this.style.borderColor = '#b08968';
-    };
-    document.getElementById('memo-input').onblur = function() {
-      this.style.borderColor = '#e8e0d4';
-    };
-
-    renderMemos();
-
-    /* ── Editable Cards (예식장 & 신혼집) ── */
-    var venueFields = ['위치', '예상 비용', '수용 인원', '메모'];
-    var houseFields = ['위치', '유형', '보증금/월세', '면적', '메모'];
-
-    function getCards(key, fields) {
-      var saved = localStorage.getItem(key);
-      if (saved) {
-        try {
-          var parsed = JSON.parse(saved);
-          if (Array.isArray(parsed)) return parsed;
-        } catch (e) { /* fall through to defaults */ }
-      }
-      var arr = [];
-      for (var i = 0; i < 3; i++) {
-        var obj = {};
-        fields.forEach(function(f) { obj[f] = '-'; });
-        arr.push(obj);
-      }
-      return arr;
-    }
-
-    function saveCards(key, data) {
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-
-    function renderCards(containerId, storageKey, fields) {
-      var container = document.getElementById(containerId);
-      var cards = getCards(storageKey, fields);
+    /* ===== Editable Cards (예식장 & 신혼집) ===== */
+    function renderCards(containerId, key, fields) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      const cards = (currentState[key] || []).map(c => ({...c}));
       container.innerHTML = '';
 
-      cards.forEach(function(card, idx) {
-        var div = document.createElement('div');
+      cards.forEach((card, idx) => {
+        const div = document.createElement('div');
         div.className = 'edit-card';
 
-        var header = document.createElement('div');
+        const header = document.createElement('div');
         header.className = 'card-header';
-        var title = document.createElement('span');
+        const title = document.createElement('span');
         title.textContent = '후보 ' + (idx + 1);
-        var btn = document.createElement('button');
+        const btn = document.createElement('button');
         btn.className = 'card-btn';
-        btn.textContent = '수정';
         header.appendChild(title);
         header.appendChild(btn);
         div.appendChild(header);
 
-        var body = document.createElement('div');
+        const body = document.createElement('div');
         body.className = 'card-body';
 
-        // View mode
-        function showView() {
+        const showView = () => {
           body.innerHTML = '';
-          fields.forEach(function(f) {
-            var row = document.createElement('div');
+          fields.forEach(f => {
+            const row = document.createElement('div');
             row.className = 'field-row';
             row.innerHTML = '<span class="field-label">' + f + '</span><span class="field-value">' + (card[f] || '-') + '</span>';
             body.appendChild(row);
           });
           btn.textContent = '수정';
-          btn.onclick = function() { showEdit(); };
-        }
+          btn.onclick = () => showEdit();
+        };
 
-        // Edit mode
-        function showEdit() {
+        const showEdit = () => {
           body.innerHTML = '';
-          var inputs = {};
-          fields.forEach(function(f) {
-            var row = document.createElement('div');
+          const inputs = {};
+          fields.forEach(f => {
+            const row = document.createElement('div');
             row.className = 'field-row';
             row.innerHTML = '<span class="field-label">' + f + '</span>';
-            var inp = document.createElement('input');
+            const inp = document.createElement('input');
             inp.className = 'field-input';
             inp.value = card[f] === '-' ? '' : card[f];
             inp.placeholder = f + ' 입력...';
@@ -967,16 +1103,13 @@
             body.appendChild(row);
           });
           btn.textContent = '저장';
-          btn.onclick = function() {
-            fields.forEach(function(f) {
-              card[f] = inputs[f].value.trim() || '-';
-            });
-            var all = getCards(storageKey, fields);
+          btn.onclick = async () => {
+            fields.forEach(f => { card[f] = inputs[f].value.trim() || '-'; });
+            const all = (currentState[key] || []).map(c => ({...c}));
             all[idx] = card;
-            saveCards(storageKey, all);
-            showView();
+            await writeData({[key]: all});
           };
-        }
+        };
 
         showView();
         div.appendChild(body);
@@ -984,122 +1117,164 @@
       });
     }
 
-    renderCards('venue-cards', 'wedding-venues', venueFields);
-    renderCards('house-cards', 'wedding-houses', houseFields);
-
-    /* ── 예식장 우선순위 (드래그 정렬 + 메모) ── */
-    var PRIORITY_KEY = 'wedding-venue-priorities';
-    var defaultPriorities = [
-      { name: '예식 날짜', memo: '' },
-      { name: '예식 시간', memo: '' },
-      { name: '예식장 분위기', memo: '' },
-      { name: '예식장 위치', memo: '' },
-      { name: '뷔페 맛', memo: '' },
-      { name: '주차장 크기', memo: '' }
-    ];
-
-    function loadPriorities() {
-      var saved = localStorage.getItem(PRIORITY_KEY);
-      if (!saved) return defaultPriorities.map(function(p){ return {name:p.name, memo:p.memo}; });
-      try {
-        var arr = JSON.parse(saved);
-        if (!Array.isArray(arr) || arr.length === 0) throw 0;
-        return arr;
-      } catch (e) {
-        return defaultPriorities.map(function(p){ return {name:p.name, memo:p.memo}; });
-      }
-    }
-
-    function savePriorities(arr) {
-      localStorage.setItem(PRIORITY_KEY, JSON.stringify(arr));
-    }
-
+    /* ===== Priorities (drag-sort + memo) ===== */
     function renderPriorities() {
-      var list = document.getElementById('priority-list');
-      var items = loadPriorities();
+      const list = document.getElementById('priority-list');
+      if (!list) return;
+
+      // 포커스 보존
+      const focused = document.activeElement;
+      const isMemoFocused = focused && focused.classList && focused.classList.contains('priority-memo');
+      const focusedIdx = isMemoFocused ? focused.closest('.priority-item')?.dataset.index : null;
+      const selStart = isMemoFocused ? focused.selectionStart : null;
+      const selEnd = isMemoFocused ? focused.selectionEnd : null;
+
+      const items = (currentState.priorities || []).map(p => ({...p}));
       list.innerHTML = '';
 
-      items.forEach(function(item, idx) {
-        var li = document.createElement('li');
+      items.forEach((item, idx) => {
+        const li = document.createElement('li');
         li.className = 'priority-item';
         li.draggable = true;
         li.dataset.index = String(idx);
 
-        var row = document.createElement('div');
+        const row = document.createElement('div');
         row.className = 'priority-row';
-
-        var handle = document.createElement('span');
+        const handle = document.createElement('span');
         handle.className = 'priority-handle';
         handle.textContent = '☰';
         handle.title = '드래그해서 이동';
-
-        var rank = document.createElement('span');
+        const rank = document.createElement('span');
         rank.className = 'priority-rank';
         rank.textContent = String(idx + 1);
-
-        var name = document.createElement('span');
+        const name = document.createElement('span');
         name.className = 'priority-name';
         name.textContent = item.name;
-
         row.appendChild(handle);
         row.appendChild(rank);
         row.appendChild(name);
         li.appendChild(row);
 
-        var memo = document.createElement('textarea');
+        const memo = document.createElement('textarea');
         memo.className = 'priority-memo';
         memo.placeholder = '이 항목에 대한 메모를 남겨주세요...';
         memo.value = item.memo || '';
-        memo.oninput = function() {
-          var arr = loadPriorities();
-          var i = parseInt(li.dataset.index, 10);
-          if (arr[i]) {
-            arr[i].memo = memo.value;
-            savePriorities(arr);
-          }
+
+        let memoTimer = null;
+        memo.oninput = () => {
+          if (memoTimer) clearTimeout(memoTimer);
+          memoTimer = setTimeout(async () => {
+            const arr = (currentState.priorities || []).map(p => ({...p}));
+            const i = parseInt(li.dataset.index, 10);
+            if (arr[i]) {
+              arr[i].memo = memo.value;
+              await writeData({priorities: arr});
+            }
+          }, 700);
         };
-        // textarea 내부에서 드래그 시작되지 않도록
-        memo.addEventListener('mousedown', function(e) { e.stopPropagation(); });
-        memo.addEventListener('dragstart', function(e) { e.preventDefault(); e.stopPropagation(); });
+        memo.addEventListener('mousedown', e => e.stopPropagation());
+        memo.addEventListener('dragstart', e => { e.preventDefault(); e.stopPropagation(); });
         li.appendChild(memo);
 
-        // ── Drag & Drop ──
-        li.addEventListener('dragstart', function(e) {
+        li.addEventListener('dragstart', e => {
           li.classList.add('dragging');
           e.dataTransfer.effectAllowed = 'move';
           e.dataTransfer.setData('text/plain', li.dataset.index);
         });
-        li.addEventListener('dragend', function() {
+        li.addEventListener('dragend', () => {
           li.classList.remove('dragging');
-          var all = document.querySelectorAll('.priority-item');
-          for (var k = 0; k < all.length; k++) all[k].classList.remove('drag-over');
+          document.querySelectorAll('.priority-item').forEach(el => el.classList.remove('drag-over'));
         });
-        li.addEventListener('dragover', function(e) {
+        li.addEventListener('dragover', e => {
           e.preventDefault();
           e.dataTransfer.dropEffect = 'move';
           if (!li.classList.contains('dragging')) li.classList.add('drag-over');
         });
-        li.addEventListener('dragleave', function() {
-          li.classList.remove('drag-over');
-        });
-        li.addEventListener('drop', function(e) {
+        li.addEventListener('dragleave', () => li.classList.remove('drag-over'));
+        li.addEventListener('drop', async e => {
           e.preventDefault();
           li.classList.remove('drag-over');
-          var from = parseInt(e.dataTransfer.getData('text/plain'), 10);
-          var to = parseInt(li.dataset.index, 10);
+          const from = parseInt(e.dataTransfer.getData('text/plain'), 10);
+          const to = parseInt(li.dataset.index, 10);
           if (isNaN(from) || isNaN(to) || from === to) return;
-          var arr = loadPriorities();
-          var moved = arr.splice(from, 1)[0];
+          const arr = (currentState.priorities || []).map(p => ({...p}));
+          const moved = arr.splice(from, 1)[0];
           arr.splice(to, 0, moved);
-          savePriorities(arr);
-          renderPriorities();
+          await writeData({priorities: arr});
         });
 
         list.appendChild(li);
       });
+
+      // 포커스 복원 (텍스트 입력 중 동기화로 인한 리렌더 시 커서 유지)
+      if (focusedIdx !== null && focusedIdx !== undefined) {
+        const newItem = list.querySelector('[data-index="' + focusedIdx + '"]');
+        const newMemo = newItem ? newItem.querySelector('.priority-memo') : null;
+        if (newMemo) {
+          newMemo.focus();
+          try { newMemo.setSelectionRange(selStart, selEnd); } catch (e) {}
+        }
+      }
     }
 
-    renderPriorities();
+    /* ===== Auth UI ===== */
+    const overlay = document.getElementById('login-overlay');
+    const loginPrompt = document.getElementById('login-prompt');
+    const loginBlocked = document.getElementById('login-blocked');
+    const blockedEmailEl = document.getElementById('blocked-email');
+    const userBar = document.getElementById('user-bar');
+    const userInfoEl = document.getElementById('user-info');
+
+    function showLogin() {
+      overlay.style.display = 'flex';
+      loginPrompt.style.display = '';
+      loginBlocked.style.display = 'none';
+      userBar.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+    }
+    function showBlocked(email) {
+      overlay.style.display = 'flex';
+      loginPrompt.style.display = 'none';
+      loginBlocked.style.display = '';
+      blockedEmailEl.textContent = email;
+      userBar.style.display = 'none';
+      document.body.style.overflow = 'hidden';
+    }
+    function showAuthorized(email) {
+      overlay.style.display = 'none';
+      userBar.style.display = 'flex';
+      userInfoEl.textContent = email;
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('google-signin').onclick = async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+      } catch (e) {
+        if (e.code !== 'auth/popup-closed-by-user') alert('로그인 실패: ' + e.message);
+      }
+    };
+    document.getElementById('logout-btn').onclick = async () => {
+      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      await signOut(auth);
+    };
+    document.getElementById('blocked-logout-btn').onclick = async () => {
+      if (unsubscribe) { unsubscribe(); unsubscribe = null; }
+      await signOut(auth);
+    };
+
+    document.getElementById('memo-add').onclick = addMemo;
+    document.getElementById('memo-input').onkeydown = e => { if (e.key === 'Enter') addMemo(); };
+    document.getElementById('memo-input').onfocus = function() { this.style.borderColor = '#b08968'; };
+    document.getElementById('memo-input').onblur = function() { this.style.borderColor = '#e8e0d4'; };
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { showLogin(); return; }
+      if (!ALLOWED_EMAILS.includes(user.email)) { showBlocked(user.email); return; }
+      showAuthorized(user.email);
+      subscribeToData();
+    });
   </script>
 </body>
 </html>
