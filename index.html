@@ -577,6 +577,7 @@
   <!-- User Bar -->
   <div id="user-bar">
     <span class="user-email"><span class="sync-indicator" title="실시간 동기화 중"></span>&#128104;&#8205;&#10084;&#65039;&#8205;&#128105; <span id="user-info"></span></span>
+    <button id="backup-btn" class="logout-btn" title="현재 데이터를 MD 파일로 다운로드">&#128229; 백업</button>
     <button id="logout-btn" class="logout-btn">로그아웃</button>
   </div>
 
@@ -1268,6 +1269,131 @@
     document.getElementById('memo-input').onkeydown = e => { if (e.key === 'Enter') addMemo(); };
     document.getElementById('memo-input').onfocus = function() { this.style.borderColor = '#b08968'; };
     document.getElementById('memo-input').onblur = function() { this.style.borderColor = '#e8e0d4'; };
+
+    /* ===== Backup: MD 생성 + 다운로드 (브레드크럼 포함) ===== */
+    function pad2(n) { return String(n).padStart(2, '0'); }
+    function fmtDate(d) {
+      return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate());
+    }
+    function fmtDateTime(d) {
+      return fmtDate(d) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+
+    function generateMD() {
+      const now = new Date();
+      const dateStr = fmtDate(now);
+      const timeStr = fmtDateTime(now);
+      const lines = [];
+
+      lines.push('# 💍 결혼 준비 데이터 백업 — ' + dateStr);
+      lines.push('');
+      lines.push('> 💾 백업 생성: ' + timeStr);
+      lines.push('> 👤 작성자: ' + (auth.currentUser?.email || '알 수 없음'));
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+
+      // ── 메모 (전역) ──
+      lines.push('## 📝 메모');
+      lines.push('');
+      lines.push('> 📍 경로: `메모`');
+      lines.push('');
+      const memos = currentState.memos || [];
+      if (memos.length === 0) {
+        lines.push('_(메모 없음)_');
+      } else {
+        memos.forEach((m, i) => {
+          lines.push((i + 1) + '. ' + m + '  ');
+          lines.push('   📍 `메모 > #' + (i + 1) + '`');
+        });
+      }
+      lines.push('');
+      lines.push('---');
+      lines.push('');
+
+      // ── 예식장 선택 우선순위 ──
+      lines.push('## ⭐ 예식장 선택 우선순위');
+      lines.push('');
+      lines.push('> 📍 경로: `예식장 후보 > 우선순위`');
+      lines.push('');
+      const priorities = currentState.priorities || [];
+      priorities.forEach((p, i) => {
+        const rank = i + 1;
+        lines.push('### ' + rank + '순위. ' + p.name);
+        lines.push('');
+        lines.push('> 📍 `예식장 후보 > 우선순위 > ' + rank + '순위. ' + p.name + ' > 메모`');
+        lines.push('');
+        if (p.memo && p.memo.trim()) {
+          p.memo.split('\n').forEach(line => lines.push('> ' + line));
+        } else {
+          lines.push('> _(메모 없음)_');
+        }
+        lines.push('');
+      });
+      lines.push('---');
+      lines.push('');
+
+      // ── 예식장 후보 ──
+      lines.push('## 🏛️ 예식장 후보 (구체)');
+      lines.push('');
+      lines.push('> 📍 경로: `예식장 후보`');
+      lines.push('');
+      const venues = currentState.venues || [];
+      venues.forEach((v, i) => {
+        const num = i + 1;
+        lines.push('### 후보 ' + num);
+        lines.push('');
+        lines.push('> 📍 `예식장 후보 > 후보 ' + num + '`');
+        lines.push('');
+        venueFields.forEach(f => {
+          const val = (v[f] || '-');
+          lines.push('- **' + f + '**: ' + val + '  ');
+          lines.push('  📍 `예식장 후보 > 후보 ' + num + ' > ' + f + '`');
+        });
+        lines.push('');
+      });
+      lines.push('---');
+      lines.push('');
+
+      // ── 신혼집 후보 ──
+      lines.push('## 🏠 신혼집 후보');
+      lines.push('');
+      lines.push('> 📍 경로: `신혼집 후보`');
+      lines.push('');
+      const houses = currentState.houses || [];
+      houses.forEach((h, i) => {
+        const num = i + 1;
+        lines.push('### 후보 ' + num);
+        lines.push('');
+        lines.push('> 📍 `신혼집 후보 > 후보 ' + num + '`');
+        lines.push('');
+        houseFields.forEach(f => {
+          const val = (h[f] || '-');
+          lines.push('- **' + f + '**: ' + val + '  ');
+          lines.push('  📍 `신혼집 후보 > 후보 ' + num + ' > ' + f + '`');
+        });
+        lines.push('');
+      });
+
+      return lines.join('\n');
+    }
+
+    function downloadBackup() {
+      const md = generateMD();
+      const dateStr = fmtDate(new Date());
+      const filename = 'wedding-backup-' + dateStr + '.md';
+      const blob = new Blob(['﻿' + md], { type: 'text/markdown;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    document.getElementById('backup-btn').onclick = downloadBackup;
 
     onAuthStateChanged(auth, (user) => {
       if (!user) { showLogin(); return; }
