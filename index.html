@@ -536,8 +536,9 @@
       width: 100%; margin-top: 10px; padding: 8px 10px;
       border: 1px solid var(--border); border-radius: 6px;
       font-size: 0.85rem; font-family: 'Noto Sans KR', sans-serif;
-      outline: none; resize: vertical; min-height: 44px;
-      background: white;
+      outline: none; resize: none; min-height: 44px;
+      background: white; overflow: hidden;
+      line-height: 1.55;
     }
     .priority-memo:focus { border-color: var(--primary); }
 
@@ -1161,8 +1162,14 @@
         memo.placeholder = '이 항목에 대한 메모를 남겨주세요...';
         memo.value = item.memo || '';
 
+        const autoResize = () => {
+          memo.style.height = 'auto';
+          memo.style.height = memo.scrollHeight + 'px';
+        };
+
         let memoTimer = null;
         memo.oninput = () => {
+          autoResize();
           if (memoTimer) clearTimeout(memoTimer);
           memoTimer = setTimeout(async () => {
             const arr = (currentState.priorities || []).map(p => ({...p}));
@@ -1176,6 +1183,8 @@
         memo.addEventListener('mousedown', e => e.stopPropagation());
         memo.addEventListener('dragstart', e => { e.preventDefault(); e.stopPropagation(); });
         li.appendChild(memo);
+        // DOM에 들어간 후 scrollHeight 계산되도록 다음 프레임에서 호출
+        requestAnimationFrame(autoResize);
 
         li.addEventListener('dragstart', e => {
           li.classList.add('dragging');
